@@ -52,6 +52,18 @@ public class ShopUnitController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/node/{id}/statistic")
+    public ResponseEntity<?> statistic(@PathVariable("id") String id,
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dateStart,
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dateEnd) {
+        if (dateStart == null) dateStart = new Date(0);
+        if (dateEnd == null) dateEnd = new Date(System.currentTimeMillis());
+        System.out.println(dateStart);
+        System.out.println(dateEnd);
+        ShopUnitStatisticResponseDTO response = shopUnitService.statistic(id, dateStart, dateEnd);
+        return ResponseEntity.ok().body(response);
+    }
+
     @PostMapping("/test")
     public ResponseEntity<Void> test(@RequestBody @Valid ShopUnitImportRequestDTO dto) {
       //  System.out.println(dto.getUpdateDate());

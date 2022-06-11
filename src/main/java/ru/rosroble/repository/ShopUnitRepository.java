@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import ru.rosroble.dto.ShopUnitStatisticUnitDTO;
 import ru.rosroble.model.ShopUnit;
 
 import java.util.*;
@@ -19,9 +20,24 @@ public interface ShopUnitRepository extends JpaRepository<ShopUnit, String> {
 
    @Modifying
    @Query(value = "INSERT INTO " +
-           "shop_units_history s ('id', 'name', 'parentId', 'type', 'price', 'date')" +
-           "values (uuid, name, parentId, type, price, date)", nativeQuery = true)
-   void insertToHistoryTable(String uuid, String name, String parentId, String type, Long price, Date date);
+           "shop_units_history (id, name, p_id, type, price, date) " +
+           "values (:id, :name, :p_id, :type, :price, :date)", nativeQuery = true)
+   void insertToHistoryTable(@Param("id") String id,
+                             @Param("name") String name,
+                             @Param("p_id") String parentId,
+                             @Param("type") String type,
+                             @Param("price") Long price,
+                             @Param("date") Date date);
+
+   default void insertToHistoryTable(Set<ShopUnit> units) {
+      units.forEach(x -> insertToHistoryTable(
+              x.getId(),
+              x.getName(),
+              x.getParent() == null ? null : x.getParent().getId(),
+              x.getType().name(),
+              x.getPrice(),
+              x.getDate()));
+   }
 
    List<ShopUnit> findShopUnitByDateBetween(Date date1, Date date2);
 

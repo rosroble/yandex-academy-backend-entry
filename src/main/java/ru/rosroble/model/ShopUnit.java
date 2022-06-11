@@ -62,7 +62,7 @@ public class ShopUnit {
     }
 
     public ShopUnitStatisticUnitDTO toShopUnitStatisticUnitDTO() {
-        return new ShopUnitStatisticUnitDTO(id, name, parent == null ? null : parent.getId(), type, price, date);
+        return new ShopUnitStatisticUnitDTO(0, id, name, parent == null ? null : parent.getId(), type, price, date);
     }
 
     @Override

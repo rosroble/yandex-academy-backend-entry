@@ -7,11 +7,13 @@ import ru.rosroble.exception.*;
 import ru.rosroble.model.ShopUnit;
 import ru.rosroble.model.ShopUnitType;
 import ru.rosroble.repository.ShopUnitRepository;
+import ru.rosroble.repository.ShopUnitStatisticRepository;
 
 import javax.transaction.Transactional;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -19,6 +21,9 @@ public class ShopUnitService {
 
     @Autowired
     ShopUnitRepository shopUnitRepository;
+
+    @Autowired
+    ShopUnitStatisticRepository shopUnitStatisticRepository;
 
 
     // check id uniqueness
@@ -47,6 +52,8 @@ public class ShopUnitService {
         updateAncestorsDate(finalPayload, updateDate);
         updateAncestorsPrice(finalPayload);
         shopUnitRepository.saveAll(finalPayload);
+        shopUnitStatisticRepository.saveAll(finalPayload.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).collect(Collectors.toList()));
+       // shopUnitRepository.insertToHistoryTable(finalPayload);
     }
 
     public ShopUnit validateAndAdd(ShopUnitImportRequestDTO dto, ShopUnitImportDTO item, Map<String, ShopUnit> unitsToAdd, Map<String, ShopUnit> updatedItems, Map<String, ShopUnitImportDTO> importSet) throws ValidationException{
@@ -123,6 +130,16 @@ public class ShopUnitService {
         Date dateMinus24 = Date.from(date.toInstant().minus(1, ChronoUnit.DAYS));
         List<ShopUnit> queryResult = shopUnitRepository.findShopUnitByDateBetween(dateMinus24, date);
         return new ShopUnitStatisticResponseDTO(queryResult.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).toList());
+    }
+
+    public ShopUnitStatisticResponseDTO statistic(String uuid, Date from, Date to) {
+        List<ShopUnitStatisticUnitDTO> queryResult = shopUnitStatisticRepository.getHistoryById(uuid);
+        if (queryResult.isEmpty()) return null;
+        Stream<ShopUnitStatisticUnitDTO> filteredQuery = queryResult.stream()
+                .filter(x -> x.getDate().after(from) && x.getDate().before(to)
+                        || x.getDate().equals(from)
+                        || x.getDate().equals(to));
+        return new ShopUnitStatisticResponseDTO(filteredQuery.toList());
     }
 
     private List<String> dtoToIdStringList(List<ShopUnitImportDTO> list) {
