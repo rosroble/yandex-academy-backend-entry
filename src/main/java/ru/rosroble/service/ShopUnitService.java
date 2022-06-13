@@ -44,14 +44,16 @@ public class ShopUnitService {
         }
         unitsToAdd.putAll(updatedItems);
         Set<ShopUnit> finalPayload = new HashSet<>(unitsToAdd.values());
+        updateAncestorsDate(finalPayload, dto.getUpdateDate());
         save(finalPayload, dto.getUpdateDate());
     }
 
     public void save(Set<ShopUnit> finalPayload, Date updateDate) {
-        shopUnitRepository.saveAll(finalPayload);
-        updateAncestorsDate(finalPayload, updateDate);
-        updateAncestorsPrice(finalPayload);
-        shopUnitRepository.saveAll(finalPayload);
+      //  shopUnitRepository.saveAll(finalPayload);
+        Set<ShopUnit> ancestorsOnly = appendAncestors(finalPayload);
+        updateAncestorsPrice(ancestorsOnly);
+        shopUnitRepository.saveAll(ancestorsOnly);
+        // log ancestors update history ??????????????????
         shopUnitStatisticRepository.saveAll(finalPayload.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).collect(Collectors.toList()));
        // shopUnitRepository.insertToHistoryTable(finalPayload);
     }
@@ -93,7 +95,7 @@ public class ShopUnitService {
             unit = updatedItems.get(item.getId());
             unit.setPrice(item.getPrice());
             unit.setName(item.getName());
-          //  unit.setDate(dto.getUpdateDate());
+            unit.setDate(dto.getUpdateDate());
         } else {
             unit = new ShopUnit(item.getId(), item.getName(), dto.getUpdateDate(), parent, item.getType(), item.getPrice(), null);
             unitsToAdd.put(unit.getId(), unit);
