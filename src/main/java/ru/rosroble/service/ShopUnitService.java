@@ -50,7 +50,7 @@ public class ShopUnitService {
 
     public void save(Set<ShopUnit> finalPayload, Date updateDate) {
       //  shopUnitRepository.saveAll(finalPayload);
-        Set<ShopUnit> ancestorsOnly = appendAncestors(finalPayload);
+        Set<ShopUnit> ancestorsOnly = getTopAncestors(finalPayload);
         updateAncestorsPrice(ancestorsOnly);
         shopUnitRepository.saveAll(ancestorsOnly);
         // log ancestors update history ??????????????????
@@ -106,21 +106,32 @@ public class ShopUnitService {
         return unit;
     }
 
-    public boolean delete(String uuid) {
+    public boolean deleteAndUpdateCategoryPrices(String uuid) {
         Optional<ShopUnit> optional = shopUnitRepository.findById(uuid);
         if (optional.isEmpty()) return false;
         ShopUnit unit = optional.get();
-        if (unit.getChildren() != null) {
-            unit.getChildren().forEach(x -> {
+        delete(unit);
+        if (unit.getParent() != null) {
+            Set<ShopUnit> set = new HashSet<>();
+            set.add(unit);
+            Set<ShopUnit> topAncestor = getTopAncestors(set);
+            updateAncestorsPrice(topAncestor);
+            shopUnitRepository.saveAll(topAncestor);
+        }
+        return true;
+    }
+
+    public void delete(ShopUnit unitToRemove) {
+        if (unitToRemove.getChildren() != null) {
+            unitToRemove.getChildren().forEach(x -> {
                 if (x.getType() == ShopUnitType.OFFER) {
                     shopUnitRepository.removeById(x.getId());
                 } else {
-                    delete(x.getId());
+                    delete(x);
                 }
             });
         }
-        shopUnitRepository.removeById(uuid);
-        return true;
+        shopUnitRepository.removeById(unitToRemove.getId());
     }
 
     public ShopUnitDTO getNode(String uuid) {
@@ -162,12 +173,12 @@ public class ShopUnitService {
     private void updateAncestorsPrice(Collection<ShopUnit> units) {
         Set<ShopUnit> updatedUnits = new HashSet<>();
         Set<ShopUnit> categorySet = units.stream().filter(x -> x.getType() == ShopUnitType.CATEGORY).collect(Collectors.toSet());
-        Set<ShopUnit> topAncestorsSet = appendAncestors(categorySet);
+        Set<ShopUnit> topAncestorsSet = getTopAncestors(categorySet);
        // units.addAll(topAncestorsSet);
         topAncestorsSet.forEach(x -> calculateCategoryPrice(x, updatedUnits));
     }
 
-    private Set<ShopUnit> appendAncestors(Collection<ShopUnit> units) {
+    private Set<ShopUnit> getTopAncestors(Collection<ShopUnit> units) {
         Set<ShopUnit> topAncestorSet = new HashSet<>();
         Set<ShopUnit> visited = new HashSet<>();
         OUTER_LOOP: for (ShopUnit unit: units) {

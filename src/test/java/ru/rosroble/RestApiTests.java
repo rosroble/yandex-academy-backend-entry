@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.rosroble.Batches.*;
@@ -51,6 +53,7 @@ public class RestApiTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void imports_tree_expect200() throws Exception {
         mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
                         .content(categoryPriceCheck))
@@ -61,6 +64,7 @@ public class RestApiTests {
     }
 
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void imports_treeByParts_expect200() throws Exception {
         for (int i = 0; i < categoryPriceCheckByParts.length; i++) {
             mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
@@ -70,6 +74,31 @@ public class RestApiTests {
                     .andExpect(status().isOk())
                     .andExpect(content().json(categoryPriceCheckByPartsNodes1C[i]));
         }
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void delete_checkEntryIsRemoved_expect404() throws Exception {
+        mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
+                .content(categoryPriceCheck))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/delete/1c"))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/delete/1c"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void delete_checkCategoryPricesAreUpdatedAfterDelete_expect200() throws Exception {
+        mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
+                .content(categoryPriceCheck))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/delete/8c"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/nodes/1c"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(nodesAfter8CDelete));
     }
 
     @Test

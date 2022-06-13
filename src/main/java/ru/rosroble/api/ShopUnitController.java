@@ -33,7 +33,7 @@ public class ShopUnitController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") String uuid) {
-        if (!shopUnitService.delete(uuid)) {
+        if (!shopUnitService.deleteAndUpdateCategoryPrices(uuid)) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().build();

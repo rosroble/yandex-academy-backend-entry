@@ -649,4 +649,74 @@ public class Batches {
                     }
                 ]
             }""".replaceAll("\\s+", "");
+
+    public static final String nodesAfter8CDelete =
+            """
+            {
+                "id": "1c",
+                "name": "1c",
+                "date": "2022-05-29T14:58:00.000Z",
+                "parentId": null,
+                "type": "CATEGORY",
+                "price": 83,
+                "children": [
+                    {
+                        "id": "2f",
+                        "name": "2f",
+                        "date": "2022-05-29T14:58:00.000Z",
+                        "parentId": "1c",
+                        "type": "OFFER",
+                        "price": 60,
+                        "children": null
+                    },
+                    {
+                        "id": "3f",
+                        "name": "3f",
+                        "date": "2022-05-29T14:58:00.000Z",
+                        "parentId": "1c",
+                        "type": "OFFER",
+                        "price": 90,
+                        "children": null
+                    },
+                    {
+                        "id": "4c",
+                        "name": "4c",
+                        "date": "2022-05-29T14:58:00.000Z",
+                        "parentId": "1c",
+                        "type": "CATEGORY",
+                        "price": 100,
+                        "children": [
+                            {
+                                "id": "6c",
+                                "name": "6c",
+                                "date": "2022-05-29T14:58:00.000Z",
+                                "parentId": "4c",
+                                "type": "CATEGORY",
+                                "price": null,
+                                "children": null
+                            },
+                            {
+                                "id": "5c",
+                                "name": "5c",
+                                "date": "2022-05-29T14:58:00.000Z",
+                                "parentId": "4c",
+                                "type": "CATEGORY",
+                                "price": 100,
+                                "children": [
+                                    {
+                                        "id": "7f",
+                                        "name": "7f",
+                                        "date": "2022-05-29T14:58:00.000Z",
+                                        "parentId": "5c",
+                                        "type": "OFFER",
+                                        "price": 100,
+                                        "children": null
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            """;
 }
