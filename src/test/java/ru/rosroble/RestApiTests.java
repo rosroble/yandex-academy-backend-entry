@@ -53,6 +53,16 @@ public class RestApiTests {
     }
 
     @Test
+    public void imports_parentNotFound_expect400() throws Exception {
+        importsExpect400(importNoParentFoundBatch);
+    }
+
+    @Test
+    public void imports_selfParentImport_expect400() throws Exception {
+        importsExpect400(importSelfParentBatch);
+    }
+
+    @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     public void imports_tree_expect200() throws Exception {
         mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
@@ -102,8 +112,20 @@ public class RestApiTests {
     }
 
     @Test
-    public void imports_parentNotFound_expect400() throws Exception {
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    public void nodes_checkCategoryPricesAreUpdatedAfterParentChange_expect200() throws Exception {
+        mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
+                .content(categoryPriceCheck))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
+                .content(categoryPriceCheckChangeParent))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/nodes/1c"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(categoryPriceCheckChangeParentNodes1C));
+        mockMvc.perform(get("/nodes/4c"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(categoryPriceCheckChangeParentNodes4C));
     }
-
 
 }

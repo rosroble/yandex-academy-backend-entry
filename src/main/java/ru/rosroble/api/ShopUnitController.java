@@ -66,7 +66,6 @@ public class ShopUnitController {
 
     @PostMapping("/test")
     public ResponseEntity<Void> test(@RequestBody @Valid ShopUnitImportRequestDTO dto) {
-      //  System.out.println(dto.getUpdateDate());
         return ResponseEntity.ok().build();
     }
 }

@@ -648,7 +648,7 @@ public class Batches {
                         ]
                     }
                 ]
-            }""".replaceAll("\\s+", "");
+            }""";
 
     public static final String nodesAfter8CDelete =
             """
@@ -718,5 +718,160 @@ public class Batches {
                     }
                 ]
             }
+            """;
+
+    public static String categoryPriceCheckChangeParent =
+            """
+            {
+                    "items": [
+                        {
+                            "type": "CATEGORY",
+                            "name": "4c",
+                            "id": "4c",
+                            "parentId": null
+                        }
+                    ],
+                    "updateDate": "2022-05-29T14:58:00Z"
+                }
+            """;
+
+    public static String categoryPriceCheckChangeParentNodes1C =
+            """
+            {
+                "id": "1c",
+                "name": "1c",
+                "date": "2022-05-29T14:58:00.000Z",
+                "parentId": null,
+                "type": "CATEGORY",
+                "price": 75,
+                "children": [
+                    {
+                        "id": "2f",
+                        "name": "2f",
+                        "date": "2022-05-29T14:58:00.000Z",
+                        "parentId": "1c",
+                        "type": "OFFER",
+                        "price": 60,
+                        "children": null
+                    },
+                    {
+                        "id": "3f",
+                        "name": "3f",
+                        "date": "2022-05-29T14:58:00.000Z",
+                        "parentId": "1c",
+                        "type": "OFFER",
+                        "price": 90,
+                        "children": null
+                    }
+                ]
+            }
+            """;
+
+    public static String categoryPriceCheckChangeParentNodes4C =
+            """
+            {
+                        "id": "4c",
+                        "name": "4c",
+                        "date": "2022-05-29T14:58:00.000Z",
+                        "parentId": null,
+                        "type": "CATEGORY",
+                        "price": 80,
+                        "children": [
+                            {
+                                "id": "6c",
+                                "name": "6c",
+                                "date": "2022-05-29T14:58:00.000Z",
+                                "parentId": "4c",
+                                "type": "CATEGORY",
+                                "price": null,
+                                "children": null
+                            },
+                            {
+                                "id": "5c",
+                                "name": "5c",
+                                "date": "2022-05-29T14:58:00.000Z",
+                                "parentId": "4c",
+                                "type": "CATEGORY",
+                                "price": 80,
+                                "children": [
+                                    {
+                                        "id": "7f",
+                                        "name": "7f",
+                                        "date": "2022-05-29T14:58:00.000Z",
+                                        "parentId": "5c",
+                                        "type": "OFFER",
+                                        "price": 100,
+                                        "children": null
+                                    },
+                                    {
+                                        "id": "8c",
+                                        "name": "8c",
+                                        "date": "2022-05-29T14:58:00.000Z",
+                                        "parentId": "5c",
+                                        "type": "CATEGORY",
+                                        "price": 70,
+                                        "children": [
+                                            {
+                                                "id": "9f",
+                                                "name": "9f",
+                                                "date": "2022-05-29T14:58:00.000Z",
+                                                "parentId": "8c",
+                                                "type": "OFFER",
+                                                "price": 80,
+                                                "children": null
+                                            },
+                                            {
+                                                "id": "10f",
+                                                "name": "10f",
+                                                "date": "2022-05-29T14:58:00.000Z",
+                                                "parentId": "8c",
+                                                "type": "OFFER",
+                                                "price": 60,
+                                                "children": null
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+            """;
+
+    public static String importNoParentFoundBatch =
+            """
+                    {
+                        "items": [
+                            {
+                                "id": "123",
+                                "name": "Оффер",
+                                "parentId": null,
+                                "price": 234,
+                                "type": "OFFER"
+                            },
+                            {
+                                "id": "1234",
+                                "name": "zxc",
+                                "parentId": "1254",
+                                "price": 34,
+                                "type": "OFFER"
+                            }
+                        ],
+                        "updateDate": "2022-05-29T14:58:00.000Z"
+                    }
+            """;
+    public static String importSelfParentBatch =
+            """
+                    {
+                        "items": [
+                            {
+                                "id": "123",
+                                "name": "SelfParent",
+                                "parentId": "123",
+                                "price": 234,
+                                "type": "CATEGORY"
+                            }
+                        ],
+                        "updateDate": "2022-05-29T14:58:00.000Z"
+                    }
             """;
 }

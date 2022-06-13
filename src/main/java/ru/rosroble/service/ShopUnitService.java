@@ -96,6 +96,13 @@ public class ShopUnitService {
             unit.setPrice(item.getPrice());
             unit.setName(item.getName());
             unit.setDate(dto.getUpdateDate());
+            ShopUnit oldParent = unit.getParent();
+            // if the parent has changed we need to remove current node from the old parent
+            if (oldParent != null && !oldParent.equals(parent)) {
+                oldParent.removeChild(unit);
+                // add old parent to update payload so the price is re-calculated
+                unitsToAdd.put(oldParent.getId(), oldParent);
+            }
         } else {
             unit = new ShopUnit(item.getId(), item.getName(), dto.getUpdateDate(), parent, item.getType(), item.getPrice(), null);
             unitsToAdd.put(unit.getId(), unit);
