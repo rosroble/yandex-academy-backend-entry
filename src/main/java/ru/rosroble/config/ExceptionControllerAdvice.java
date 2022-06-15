@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.rosroble.dto.ErrorDTO;
 
+import javax.validation.ConstraintViolationException;
+
 
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
@@ -34,5 +36,13 @@ public class ExceptionControllerAdvice {
         return ResponseEntity.badRequest()
                 .header("Content-Type", "application/json")
                 .body(new ErrorDTO(400, "Parameter validation error. Type mismatch."));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorDTO> handleConstraintViolationException(ConstraintViolationException ex) {
+        return ResponseEntity.badRequest()
+                .header("Content-Type", "application/json")
+                .body(new ErrorDTO(400, ex.getMessage()));
     }
 }

@@ -874,4 +874,75 @@ public class Batches {
                         "updateDate": "2022-05-29T14:58:00.000Z"
                     }
             """;
+
+    public static final String offerAsParent =
+        """
+        {
+            "items": [
+                {
+                    "id": "123",
+                    "name": "Оффер",
+                    "parentId": null,
+                    "price": 234,
+                    "type": "OFFER"
+                },
+                {
+                    "id": "1234",
+                    "name": "zxc",
+                    "parentId": "123",
+                    "price": 34,
+                    "type": "OFFER"
+                }
+            ],
+            "updateDate": "2022-05-29T14:58:00.000Z"
+        }
+        """;
+
+    public static final String salesExpectedBatch =
+            """
+            {
+                "items": [
+                    {
+                        "id": "1c",
+                        "name": "1c",
+                        "date": "2022-06-05T00:00:02.000Z",
+                        "parentId": null,
+                        "price": 78 ,
+                        "type": "CATEGORY"
+                    },
+                    {
+                        "id": "4c",
+                        "name": "4c",
+                        "date": "2022-06-05T00:00:02.000Z",
+                        "parentId": "1c",
+                        "price": 80,
+                        "type": "CATEGORY"
+                    },
+                    {
+                        "id": "5c",
+                        "name": "5c",
+                        "date": "2022-06-05T00:00:02.000Z",
+                        "parentId": "4c",
+                        "price": 80,
+                        "type": "CATEGORY"
+                    },
+                    {
+                        "id": "8c",
+                        "name": "8c",
+                        "date": "2022-06-05T00:00:02.000Z",
+                        "parentId": "5c",
+                        "price": 70,
+                        "type": "CATEGORY"
+                    },
+                    {
+                        "id": "10f",
+                        "name": "10f",
+                        "date": "2022-06-05T00:00:02.000Z",
+                        "parentId": "8c",
+                        "price": 60,
+                        "type": "OFFER"
+                    }
+                ]
+            }
+            """;
 }

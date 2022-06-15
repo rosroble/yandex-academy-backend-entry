@@ -1,5 +1,6 @@
 package ru.rosroble.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class ShopUnitStatisticUnitDTO {
     @Enumerated(EnumType.STRING)
     private ShopUnitType type;
     private Long price;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date date;
 }

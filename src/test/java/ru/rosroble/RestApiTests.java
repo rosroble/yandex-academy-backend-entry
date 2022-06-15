@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.rosroble.Batches.*;
@@ -30,7 +31,8 @@ public class RestApiTests {
     private void importsExpect400(String content) throws Exception {
         mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
                         .content(content))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andDo(print());
               //  .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
@@ -61,6 +63,13 @@ public class RestApiTests {
     public void imports_selfParentImport_expect400() throws Exception {
         importsExpect400(importSelfParentBatch);
     }
+
+    @Test
+    public void imports_offerAsParent_expect400() throws Exception {
+        importsExpect400(offerAsParent);
+    }
+
+
 
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
@@ -127,5 +136,44 @@ public class RestApiTests {
                 .andExpect(status().isOk())
                 .andExpect(content().json(categoryPriceCheckChangeParentNodes4C));
     }
+
+    @Test
+    public void nodes_itemNotFoundAfterDelete_expect404() throws Exception {
+        mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)
+                .content(categoryPriceCheck))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/nodes/4c"))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/delete/4c"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/nodes/4c"))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void sales_invalidDateParameter_expect400() throws Exception {
+        mockMvc.perform(get("/sales")
+                .param("date", "2022-05-28TM21:12:01.516Z"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void sales_dateIsOutOfRange_expect400() throws Exception {
+        mockMvc.perform(get("/sales")
+                .param("date", "10000000-01-01T00:00:00.000Z"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void sales_testBatch_expect200() throws Exception {
+        imports_treeByParts_expect200();
+        mockMvc.perform(get("/sales")
+                .param("date", "2022-06-06T00:00:01.000Z"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(salesExpectedBatch));
+    }
+
+
 
 }

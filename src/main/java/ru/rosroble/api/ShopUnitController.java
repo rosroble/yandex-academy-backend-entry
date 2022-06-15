@@ -4,16 +4,19 @@ package ru.rosroble.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.rosroble.dto.*;
 import ru.rosroble.service.ShopUnitService;
 
 import javax.validation.Valid;
 import ru.rosroble.exception.ValidationException;
+import ru.rosroble.validator.ValidDateRange;
 
 import java.util.Date;
 
 @RestController
+@Validated
 public class ShopUnitController {
 
     @Autowired
@@ -47,15 +50,16 @@ public class ShopUnitController {
 
     @GetMapping("/sales")
     public ResponseEntity<?> sales(@RequestParam("date")
-                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date) {
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                       @ValidDateRange Date date) {
         ShopUnitStatisticResponseDTO response = shopUnitService.sales(date);
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/node/{id}/statistic")
     public ResponseEntity<?> statistic(@PathVariable("id") String id,
-                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dateStart,
-                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date dateEnd) {
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @ValidDateRange Date dateStart,
+                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @ValidDateRange Date dateEnd) {
         if (dateStart == null) dateStart = new Date(0);
         if (dateEnd == null) dateEnd = new Date(System.currentTimeMillis());
         System.out.println(dateStart);
@@ -64,6 +68,7 @@ public class ShopUnitController {
         return ResponseEntity.ok().body(response);
     }
 
+    // delete
     @PostMapping("/test")
     public ResponseEntity<Void> test(@RequestBody @Valid ShopUnitImportRequestDTO dto) {
         return ResponseEntity.ok().build();
