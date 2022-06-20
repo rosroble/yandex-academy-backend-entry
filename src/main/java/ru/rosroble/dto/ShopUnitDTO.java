@@ -6,19 +6,19 @@ import ru.rosroble.model.ShopUnitType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 public class ShopUnitDTO {
     @NotBlank
-    private String id;
+    private UUID id;
     @NotBlank
     private String name;
     @NotNull
     private String date;
-    private String parentId;
+    private UUID parentId;
     @NotNull
     private ShopUnitType type;
     private Long price;

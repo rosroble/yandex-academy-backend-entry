@@ -22,7 +22,7 @@ import java.util.*;
 public class ShopUnit {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -54,7 +54,7 @@ public class ShopUnit {
     }
 
     public ShopUnitDTO toShopUnitDTO() {
-        String parentId = parent == null ? null : parent.getId();
+        UUID parentId = parent == null ? null : parent.getId();
         List<ShopUnitDTO> shopUnitDTOList = children.stream().map(ShopUnit::toShopUnitDTO).toList();
         if (shopUnitDTOList.isEmpty()) shopUnitDTOList = null;
         String dateToStr = date.toInstant().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));

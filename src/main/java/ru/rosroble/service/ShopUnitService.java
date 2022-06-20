@@ -26,39 +26,79 @@ public class ShopUnitService {
     ShopUnitStatisticRepository shopUnitStatisticRepository;
 
 
-    // check id uniqueness
-    // check type is not updated
-    // check all the parentIds are present
-    // check no items have offer as a parent
+
+
+    /**
+     * Service method for importing entries via POST /imports endpoint.
+     * Accepts a validated ShopUnitImportRequestDTO object.
+     * The algorithm of importing new / changing old units:
+     * 1. Check the ID uniqueness of all incoming units.
+     * 2. Try to fetch all incoming units from the database (in case the unit is updated and not created)
+     * 3. Try to fetch all the parents of all incoming units from the database
+     * 4. Validate and add all the incoming units to a set.
+     * 5. Update dates and prices and then save to database.
+     * @param dto a dto accepted from the client
+     * @throws ValidationException if any of the specified constraints are violated
+     */
     public void importNewUnits(ShopUnitImportRequestDTO dto) throws ValidationException {
         List<ShopUnitImportDTO> items = dto.getItems();
-        Map<String, ShopUnitImportDTO> importSet = items.stream().collect(Collectors.toMap(ShopUnitImportDTO::getId, x -> x, (x1, x2) -> x1));
+        Map<UUID, ShopUnitImportDTO> importSet = items.stream().collect(Collectors.toMap(ShopUnitImportDTO::getId, x -> x, (x1, x2) -> x1));
         if (items.size() != importSet.size()) {
             throw new IdsAreNotUniqueException("Imported items IDs should be unique.");
         }
-        Map<String, ShopUnit> updatedItems = shopUnitRepository.findShopUnitsByIdInMap(dtoToIdStringList(items));
+        Map<UUID, ShopUnit> updatedItems = shopUnitRepository.findShopUnitsByIdInMap(dtoToIdStringList(items));
         updatedItems.putAll(shopUnitRepository.findShopUnitsByIdInMap(dtoToParentStringList(items)));
-        Map<String, ShopUnit> unitsToAdd = new HashMap<>();
+        Map<UUID, ShopUnit> unitsToAdd = new HashMap<>();
         for (ShopUnitImportDTO item: items) {
             validateAndAdd(dto, item, unitsToAdd, updatedItems, importSet);
         }
         unitsToAdd.putAll(updatedItems);
         Set<ShopUnit> finalPayload = new HashSet<>(unitsToAdd.values());
         updateAncestorsDate(finalPayload, dto.getUpdateDate());
-        save(finalPayload, dto.getUpdateDate());
+        save(finalPayload);
     }
 
-    public void save(Set<ShopUnit> finalPayload, Date updateDate) {
-      //  shopUnitRepository.saveAll(finalPayload);
+    /**
+     * Calls price update method and then saves changes to database
+     * @param finalPayload a set of the units to save/update
+     */
+    private void save(Set<ShopUnit> finalPayload) {
         Set<ShopUnit> ancestorsOnly = getTopAncestors(finalPayload);
         updateAncestorsPrice(ancestorsOnly);
         shopUnitRepository.saveAll(ancestorsOnly);
         // log ancestors update history ??????????????????
         shopUnitStatisticRepository.saveAll(finalPayload.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).collect(Collectors.toList()));
-       // shopUnitRepository.insertToHistoryTable(finalPayload);
     }
 
-    public ShopUnit validateAndAdd(ShopUnitImportRequestDTO dto, ShopUnitImportDTO item, Map<String, ShopUnit> unitsToAdd, Map<String, ShopUnit> updatedItems, Map<String, ShopUnitImportDTO> importSet) throws ValidationException{
+
+    /**
+     * Method containing the main logic of items validation.<br>
+     * The algorithm of validation:<br>
+     * 1. Try to find incoming unit among existing ones (the unit could be updated)<br>
+     * 2. If it's found, check the client is not trying to change the type, otherwise throw an exception<br>
+     * 3. Check the item id and parent id are different, otherwise throw an exception.<br>
+     * 4. Parent resolve:<br>
+     * 4.1 Try to find item's parent ID among existing units.<br>
+     * 4.2 If not found - try to find item's parent among processed incoming units<br>
+     * 4.3 If not found - the parent may not be processed yet, try to process it using its id.<br>
+     * 4.4 If not found - the parent doesn't exist. Throw an exception.<br>
+     * 4.5 If the parent is found and processed ensure its type is "CATEGORY", otherwise throw an exception<br>
+     * 5. In case the processed item is a category ensure it <b>doesn't have</b> a price, otherwise throw an exception<br>
+     * 6. In case the processed item is an offer ensure it <b>does have</b> a price, otherwise throw an exception<br>
+     * 7. If the processed item is a new version of the existing one, then update its attributes<br>
+     * 7.1 If the processed item has its parent changed, remove old parent-child relation and add the old parent to a set
+     * for further DB update.<br>
+     * 8. Else if the processed item is a new unit, then create a new object and add it to a set of new items (unitsToAdd).<br>
+     * 9. If the processed item has a parent, assign two-side parent-child relation<br>
+     * @param dto a dto containing the list of all processed items and an update date
+     * @param item currently processed item
+     * @param unitsToAdd a map containing new (not found among existing) processed units
+     * @param updatedItems a map containing fetched from the db existing units, that are going to be updated
+     * @param importMap ID to ShopUnitImportDTO map, containing all the incoming items
+     * @return a validated ShopUnit
+     * @throws ValidationException thrown if any of the specified constraints are violated
+     */
+    private ShopUnit validateAndAdd(ShopUnitImportRequestDTO dto, ShopUnitImportDTO item, Map<UUID, ShopUnit> unitsToAdd, Map<UUID, ShopUnit> updatedItems, Map<UUID, ShopUnitImportDTO> importMap) throws ValidationException{
         if (unitsToAdd.containsKey(item.getId())) return null;
         ShopUnit dbItem = updatedItems.get(item.getId());
         if ((dbItem != null) && (item.getType() != dbItem.getType())){
@@ -73,9 +113,9 @@ public class ShopUnitService {
         if (parent == null) {
             parent = unitsToAdd.get(item.getParentId()); // search among current payload
         }
-        if (item.getParentId() != null && parent == null && importSet.containsKey(item.getParentId())) {
+        if (item.getParentId() != null && parent == null && importMap.containsKey(item.getParentId())) {
             // still not found? maybe we process the child first, try to process its parent in the current payload
-            parent = validateAndAdd(dto, importSet.get(item.getParentId()), unitsToAdd, updatedItems, importSet);
+            parent = validateAndAdd(dto, importMap.get(item.getParentId()), unitsToAdd, updatedItems, importMap);
         }
         if ((parent == null) && (item.getParentId() != null)) {
             throw new BadParentException("Parent does not exist.");
@@ -113,7 +153,7 @@ public class ShopUnitService {
         return unit;
     }
 
-    public boolean deleteAndUpdateCategoryPrices(String uuid) {
+    public boolean deleteAndUpdateCategoryPrices(UUID uuid) {
         Optional<ShopUnit> optional = shopUnitRepository.findById(uuid);
         if (optional.isEmpty()) return false;
         ShopUnit unit = optional.get();
@@ -128,7 +168,7 @@ public class ShopUnitService {
         return true;
     }
 
-    public void delete(ShopUnit unitToRemove) {
+    private void delete(ShopUnit unitToRemove) {
         if (unitToRemove.getChildren() != null) {
             unitToRemove.getChildren().forEach(x -> {
                 if (x.getType() == ShopUnitType.OFFER) {
@@ -141,7 +181,7 @@ public class ShopUnitService {
         shopUnitRepository.removeById(unitToRemove.getId());
     }
 
-    public ShopUnitDTO getNode(String uuid) {
+    public ShopUnitDTO getNode(UUID uuid) {
         Optional<ShopUnit> optional = shopUnitRepository.findById(uuid);
         return optional.isEmpty() ? null : optional.get().toShopUnitDTO();
     }
@@ -149,10 +189,12 @@ public class ShopUnitService {
     public ShopUnitStatisticResponseDTO sales(Date date) {
         Date dateMinus24 = Date.from(date.toInstant().minus(1, ChronoUnit.DAYS));
         List<ShopUnit> queryResult = shopUnitRepository.findShopUnitByDateBetween(dateMinus24, date);
-        return new ShopUnitStatisticResponseDTO(queryResult.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).toList());
+        return new ShopUnitStatisticResponseDTO(queryResult.stream()
+                .filter(x -> x.getType() == ShopUnitType.OFFER)
+                .map(ShopUnit::toShopUnitStatisticUnitDTO).toList());
     }
 
-    public ShopUnitStatisticResponseDTO statistic(String uuid, Date from, Date to) {
+    public ShopUnitStatisticResponseDTO statistic(UUID uuid, Date from, Date to) {
         List<ShopUnitStatisticUnitDTO> queryResult = shopUnitStatisticRepository.getHistoryById(uuid);
         if (queryResult.isEmpty()) return null;
         Stream<ShopUnitStatisticUnitDTO> filteredQuery = queryResult.stream()
@@ -162,11 +204,11 @@ public class ShopUnitService {
         return new ShopUnitStatisticResponseDTO(filteredQuery.toList());
     }
 
-    private List<String> dtoToIdStringList(List<ShopUnitImportDTO> list) {
+    private List<UUID> dtoToIdStringList(List<ShopUnitImportDTO> list) {
         return list.stream().map(ShopUnitImportDTO::getId).toList();
     }
 
-    private List<String> dtoToParentStringList(List<ShopUnitImportDTO> list) {
+    private List<UUID> dtoToParentStringList(List<ShopUnitImportDTO> list) {
         return list.stream().map(ShopUnitImportDTO::getParentId).toList();
     }
 
@@ -181,7 +223,6 @@ public class ShopUnitService {
         Set<ShopUnit> updatedUnits = new HashSet<>();
         Set<ShopUnit> categorySet = units.stream().filter(x -> x.getType() == ShopUnitType.CATEGORY).collect(Collectors.toSet());
         Set<ShopUnit> topAncestorsSet = getTopAncestors(categorySet);
-       // units.addAll(topAncestorsSet);
         topAncestorsSet.forEach(x -> calculateCategoryPrice(x, updatedUnits));
     }
 

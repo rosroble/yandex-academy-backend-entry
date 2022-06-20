@@ -11,20 +11,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public interface ShopUnitRepository extends JpaRepository<ShopUnit, String> {
-   List<ShopUnit> findShopUnitsByIdIn(Collection<String> id);
-   Optional<ShopUnit> findById(String uuid);
+   List<ShopUnit> findShopUnitsByIdIn(Collection<UUID> id);
+   Optional<ShopUnit> findById(UUID uuid);
 
    @Modifying
    @Query(value = "DELETE FROM shop_units s WHERE s.id=:uuid", nativeQuery = true)
-   void removeById(@Param("uuid") String uuid);
+   void removeById(@Param("uuid") UUID uuid);
 
    @Modifying
    @Query(value = "INSERT INTO " +
            "shop_units_history (id, name, p_id, type, price, date) " +
            "values (:id, :name, :p_id, :type, :price, :date)", nativeQuery = true)
-   void insertToHistoryTable(@Param("id") String id,
+   void insertToHistoryTable(@Param("id") UUID id,
                              @Param("name") String name,
-                             @Param("p_id") String parentId,
+                             @Param("p_id") UUID parentId,
                              @Param("type") String type,
                              @Param("price") Long price,
                              @Param("date") Date date);
@@ -41,7 +41,7 @@ public interface ShopUnitRepository extends JpaRepository<ShopUnit, String> {
 
    List<ShopUnit> findShopUnitByDateBetween(Date date1, Date date2);
 
-   default Map<String, ShopUnit> findShopUnitsByIdInMap(Collection<String> id) {
+   default Map<UUID, ShopUnit> findShopUnitsByIdInMap(Collection<UUID> id) {
       return findShopUnitsByIdIn(id).stream().collect(Collectors.toMap(ShopUnit::getId, x -> x));
    }
 

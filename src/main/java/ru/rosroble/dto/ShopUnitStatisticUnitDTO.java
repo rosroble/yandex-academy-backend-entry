@@ -10,6 +10,7 @@ import ru.rosroble.model.ShopUnitType;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "shop_units_history")
@@ -21,10 +22,10 @@ public class ShopUnitStatisticUnitDTO {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonIgnore
     private int index;
-    private String id;
+    private UUID id;
     private String name;
-    @Column(name = "parentId")
-    private String parentId;
+    @Column(name = "parent_id")
+    private UUID parentId;
     @Enumerated(EnumType.STRING)
     private ShopUnitType type;
     private Long price;

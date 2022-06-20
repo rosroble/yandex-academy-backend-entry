@@ -14,7 +14,12 @@ import ru.rosroble.exception.ValidationException;
 import ru.rosroble.validator.ValidDateRange;
 
 import java.util.Date;
+import java.util.UUID;
 
+
+/**
+ * Primary controller holding endpoints for the REST API
+ */
 @RestController
 @Validated
 public class ShopUnitController {
@@ -35,7 +40,7 @@ public class ShopUnitController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") String uuid) {
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID uuid) {
         if (!shopUnitService.deleteAndUpdateCategoryPrices(uuid)) {
             return ResponseEntity.notFound().build();
         }
@@ -43,7 +48,7 @@ public class ShopUnitController {
     }
 
     @GetMapping("/nodes/{id}")
-    public ResponseEntity<?> nodes(@PathVariable("id") String uuid) {
+    public ResponseEntity<?> nodes(@PathVariable("id") UUID uuid) {
         ShopUnitDTO unitDto = shopUnitService.getNode(uuid);
         return unitDto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok().body(unitDto);
     }
@@ -57,20 +62,13 @@ public class ShopUnitController {
     }
 
     @GetMapping("/node/{id}/statistic")
-    public ResponseEntity<?> statistic(@PathVariable("id") String id,
+    public ResponseEntity<?> statistic(@PathVariable("id") UUID id,
                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @ValidDateRange Date dateStart,
                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @ValidDateRange Date dateEnd) {
         if (dateStart == null) dateStart = new Date(0);
         if (dateEnd == null) dateEnd = new Date(System.currentTimeMillis());
-        System.out.println(dateStart);
-        System.out.println(dateEnd);
         ShopUnitStatisticResponseDTO response = shopUnitService.statistic(id, dateStart, dateEnd);
         return ResponseEntity.ok().body(response);
     }
 
-    // delete
-    @PostMapping("/test")
-    public ResponseEntity<Void> test(@RequestBody @Valid ShopUnitImportRequestDTO dto) {
-        return ResponseEntity.ok().build();
-    }
 }

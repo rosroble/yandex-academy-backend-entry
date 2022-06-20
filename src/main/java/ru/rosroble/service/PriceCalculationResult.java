@@ -28,7 +28,4 @@ public class PriceCalculationResult {
         sum += inc;
     }
 
-    public PriceCalculationResult addNew(PriceCalculationResult result) {
-        return new PriceCalculationResult(count + result.count, sum + result.sum);
-    }
 }
