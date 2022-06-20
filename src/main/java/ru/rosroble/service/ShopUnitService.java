@@ -63,11 +63,11 @@ public class ShopUnitService {
      * @param finalPayload a set of the units to save/update
      */
     private void save(Set<ShopUnit> finalPayload) {
-        Set<ShopUnit> ancestorsOnly = getTopAncestors(finalPayload);
-        updateAncestorsPrice(ancestorsOnly);
-        shopUnitRepository.saveAll(ancestorsOnly);
-        // log ancestors update history ??????????????????
-        shopUnitStatisticRepository.saveAll(finalPayload.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).collect(Collectors.toList()));
+        Set<ShopUnit> topAncestors = getTopAncestors(finalPayload); // roots
+        Set<ShopUnit> allAncestors = getAllAncestors(finalPayload); // all
+        updateAncestorsPrice(topAncestors);
+        shopUnitRepository.saveAll(topAncestors);
+        shopUnitStatisticRepository.saveAll(allAncestors.stream().map(ShopUnit::toShopUnitStatisticUnitDTO).collect(Collectors.toList()));
     }
 
 
@@ -153,6 +153,8 @@ public class ShopUnitService {
         return unit;
     }
 
+
+
     public boolean deleteAndUpdateCategoryPrices(UUID uuid) {
         Optional<ShopUnit> optional = shopUnitRepository.findById(uuid);
         if (optional.isEmpty()) return false;
@@ -173,11 +175,13 @@ public class ShopUnitService {
             unitToRemove.getChildren().forEach(x -> {
                 if (x.getType() == ShopUnitType.OFFER) {
                     shopUnitRepository.removeById(x.getId());
+                    shopUnitStatisticRepository.removeById(x.getId());
                 } else {
                     delete(x);
                 }
             });
         }
+        shopUnitRepository.removeById(unitToRemove.getId());
         shopUnitRepository.removeById(unitToRemove.getId());
     }
 
@@ -224,6 +228,20 @@ public class ShopUnitService {
         Set<ShopUnit> categorySet = units.stream().filter(x -> x.getType() == ShopUnitType.CATEGORY).collect(Collectors.toSet());
         Set<ShopUnit> topAncestorsSet = getTopAncestors(categorySet);
         topAncestorsSet.forEach(x -> calculateCategoryPrice(x, updatedUnits));
+    }
+
+    private Set<ShopUnit> getAllAncestors(Collection<ShopUnit> units) {
+        Set<ShopUnit> result = new HashSet<>();
+        units.forEach(x -> getAllAncestors(x, result));
+        return result;
+    }
+
+    private void getAllAncestors(ShopUnit unit, Set<ShopUnit> result) {
+        do {
+            if (result.contains(unit)) break;
+            result.add(unit);
+            unit = unit.getParent();
+        } while (unit != null);
     }
 
     private Set<ShopUnit> getTopAncestors(Collection<ShopUnit> units) {

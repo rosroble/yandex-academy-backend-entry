@@ -11,4 +11,6 @@ public interface ShopUnitStatisticRepository extends JpaRepository<ShopUnitStati
     @Query(value = "SELECT DISTINCT * FROM shop_units_history s WHERE s.id=:uuid", nativeQuery = true)
     List<ShopUnitStatisticUnitDTO> getHistoryById(UUID uuid);
     List<ShopUnitStatisticUnitDTO> getAllById(UUID uuid);
+
+    void removeById(UUID id);
 }
