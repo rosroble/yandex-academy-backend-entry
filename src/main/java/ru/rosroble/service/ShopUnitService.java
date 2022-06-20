@@ -154,7 +154,11 @@ public class ShopUnitService {
     }
 
 
-
+    /**
+     * Removes an item and all of its children while recalculating and updating the prices for its ancestors
+     * @param uuid item's uuid
+     * @return <code>true</code> if successfully removed, <code>false</code> otherwise (not found)
+     */
     public boolean deleteAndUpdateCategoryPrices(UUID uuid) {
         Optional<ShopUnit> optional = shopUnitRepository.findById(uuid);
         if (optional.isEmpty()) return false;
@@ -170,6 +174,10 @@ public class ShopUnitService {
         return true;
     }
 
+    /**
+     * Recursively remove a unit and all of its children from the main table and the statistics table
+     * @param unitToRemove a ShopUnit object representing the removed item
+     */
     private void delete(ShopUnit unitToRemove) {
         if (unitToRemove.getChildren() != null) {
             unitToRemove.getChildren().forEach(x -> {
@@ -185,11 +193,21 @@ public class ShopUnitService {
         shopUnitRepository.removeById(unitToRemove.getId());
     }
 
+    /**
+     * Finds an item by its UUID and returns it as a DTO for further serializing and sending to the client
+     * @param uuid item's uuid
+     * @return <code>ShopUnitDTO</code> object for the stated UUID or <code>null</code> if not found
+     */
     public ShopUnitDTO getNode(UUID uuid) {
         Optional<ShopUnit> optional = shopUnitRepository.findById(uuid);
         return optional.isEmpty() ? null : optional.get().toShopUnitDTO();
     }
 
+    /**
+     * Fetches all the items which had been updated during 24 hours before the date given.
+     * @param date a corresponding date
+     * @return a <code>ShopUnitStatisticResponseDTO</code> object containing all the items fetched
+     */
     public ShopUnitStatisticResponseDTO sales(Date date) {
         Date dateMinus24 = Date.from(date.toInstant().minus(1, ChronoUnit.DAYS));
         List<ShopUnit> queryResult = shopUnitRepository.findShopUnitByDateBetween(dateMinus24, date);
@@ -198,6 +216,14 @@ public class ShopUnitService {
                 .map(ShopUnit::toShopUnitStatisticUnitDTO).toList());
     }
 
+    /**
+     * Fetches the update history for the item by UUID given in a given time range
+     * @param uuid an uuid of the item
+     * @param from lower bound of the time range
+     * @param to upper bound of the time range
+     * @return a <code>ShopUnitStatisticResponseDTO</code> object containing the update history,
+     * <code>null</code> if no item was found.
+     */
     public ShopUnitStatisticResponseDTO statistic(UUID uuid, Date from, Date to) {
         List<ShopUnitStatisticUnitDTO> queryResult = shopUnitStatisticRepository.getHistoryById(uuid);
         if (queryResult.isEmpty()) return null;
