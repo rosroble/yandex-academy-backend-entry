@@ -181,14 +181,14 @@ public class ShopUnitService {
             unitToRemove.getChildren().forEach(x -> {
                 if (x.getType() == ShopUnitType.OFFER) {
                     shopUnitRepository.removeById(x.getId());
-                    shopUnitStatisticRepository.removeById(x.getId());
+                    shopUnitStatisticRepository.removeAllById(x.getId());
                 } else {
                     delete(x);
                 }
             });
         }
         shopUnitRepository.removeById(unitToRemove.getId());
-        shopUnitRepository.removeById(unitToRemove.getId());
+        shopUnitStatisticRepository.removeAllById(unitToRemove.getId());
     }
 
     /**
