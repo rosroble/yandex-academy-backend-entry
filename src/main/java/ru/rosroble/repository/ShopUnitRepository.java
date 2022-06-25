@@ -44,6 +44,4 @@ public interface ShopUnitRepository extends JpaRepository<ShopUnit, String> {
       return findShopUnitsByIdIn(id).stream().collect(Collectors.toMap(ShopUnit::getId, x -> x));
    }
 
-   void deleteAll();
-
 }

@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.rosroble</groupId>
     <artifactId>yandex-backend-school-entry-task</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>yandex-backend-school-entry-task</name>
     <description>yandex-backend-school-entry-task</description>
     <properties>

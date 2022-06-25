@@ -26,10 +26,11 @@ $ sudo -i -u postgres
 $ psql
 ```
 
-Создаём базу данных.
+Создаём базу основную базу данных и базу данных для тестирования.
 
 ```sql
-CREATE DATABASE yandex
+CREATE DATABASE yandex;
+CREATE DATABASE test;
 ```
 
 Создаём нового пользователя с правами админа
@@ -37,6 +38,7 @@ CREATE DATABASE yandex
 ```sql
 CREATE USER boris WITH PASSWORD 'password';
 GRANT ALL PRIVILEGES ON DATABASE yandex TO boris;
+GRANT ALL PRIVILEGES ON DATABASE test TO boris;
 ```
 
 База данных готова. Обращаю внимание, что никакие таблицы создавать не требуется, этим занимается приложение.

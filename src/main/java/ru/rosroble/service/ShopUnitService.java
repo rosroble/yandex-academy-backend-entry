@@ -227,8 +227,7 @@ public class ShopUnitService {
         if (queryResult.isEmpty()) return null;
         Stream<ShopUnitStatisticUnitDTO> filteredQuery = queryResult.stream()
                 .filter(x -> x.getDate().after(from) && x.getDate().before(to)
-                        || x.getDate().equals(from)
-                        || x.getDate().equals(to));
+                        || x.getDate().equals(from));
         return new ShopUnitStatisticResponseDTO(filteredQuery.toList());
     }
 

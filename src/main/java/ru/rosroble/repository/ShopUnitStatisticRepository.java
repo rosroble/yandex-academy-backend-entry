@@ -14,6 +14,4 @@ public interface ShopUnitStatisticRepository extends JpaRepository<ShopUnitStati
 
     void removeById(UUID id);
 
-    void deleteAll();
-
 }
