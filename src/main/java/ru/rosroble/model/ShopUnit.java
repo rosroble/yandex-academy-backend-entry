@@ -56,7 +56,7 @@ public class ShopUnit {
     public ShopUnitDTO toShopUnitDTO() {
         UUID parentId = parent == null ? null : parent.getId();
         List<ShopUnitDTO> shopUnitDTOList = children.stream().map(ShopUnit::toShopUnitDTO).toList();
-        if (shopUnitDTOList.isEmpty()) shopUnitDTOList = null;
+        if (shopUnitDTOList.isEmpty() && type == ShopUnitType.OFFER) shopUnitDTOList = null;
         String dateToStr = date.toInstant().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
         return new ShopUnitDTO(id, name, dateToStr, parentId, type, price, shopUnitDTOList);
     }

@@ -24,8 +24,7 @@ import static ru.rosroble.Batches.*;
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class RestApiTest {
+   public class RestApiTest {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired

@@ -259,7 +259,7 @@ public class Batches {
                 "parentId": null,
                 "type": "CATEGORY",
                 "price": null,
-                "children": null
+                "children": []
             }
             """,
             """
@@ -296,7 +296,7 @@ public class Batches {
                         "parentId": "6aed457f-8a26-44c0-ac5e-a9d8d4b3c6c2",
                         "type": "CATEGORY",
                         "price": null,
-                        "children": null
+                        "children": []
                     }
                 ]
             }
@@ -362,7 +362,7 @@ public class Batches {
                                 "parentId": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
                                 "type": "CATEGORY",
                                 "price": null,
-                                "children": null
+                                "children": []
                             }
                         ]
                     }
@@ -449,7 +449,7 @@ public class Batches {
                                 "parentId": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
                                 "type": "CATEGORY",
                                 "price": null,
-                                "children": null
+                                "children": []
                             }
                         ]
                     }
@@ -545,7 +545,7 @@ public class Batches {
                                 "parentId": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
                                 "type": "CATEGORY",
                                 "price": null,
-                                "children": null
+                                "children": []
                             }
                         ]
                     }
@@ -596,7 +596,7 @@ public class Batches {
                                 "parentId": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
                                 "type": "CATEGORY",
                                 "price": null,
-                                "children": null
+                                "children": []
                             },
                             {
                                 "id": "afc5f4bf-2430-46d4-9437-c209783a8a1d",
@@ -693,7 +693,7 @@ public class Batches {
                                 "parentId": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
                                 "type": "CATEGORY",
                                 "price": null,
-                                "children": null
+                                "children": []
                             },
                             {
                                 "id": "afc5f4bf-2430-46d4-9437-c209783a8a1d",
@@ -784,7 +784,7 @@ public class Batches {
                                 "parentId": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
                                 "type": "CATEGORY",
                                 "price": null,
-                                "children": null
+                                "children": []
                             },
                             {
                                 "id": "afc5f4bf-2430-46d4-9437-c209783a8a1d",
