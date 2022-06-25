@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.rosroble.dto.ShopUnitStatisticUnitDTO;
 import ru.rosroble.model.ShopUnit;
 
 import java.util.*;
@@ -44,5 +43,7 @@ public interface ShopUnitRepository extends JpaRepository<ShopUnit, String> {
    default Map<UUID, ShopUnit> findShopUnitsByIdInMap(Collection<UUID> id) {
       return findShopUnitsByIdIn(id).stream().collect(Collectors.toMap(ShopUnit::getId, x -> x));
    }
+
+   void deleteAll();
 
 }

@@ -1,9 +1,8 @@
 package ru.rosroble;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +12,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.rosroble.repository.ShopUnitRepository;
+import ru.rosroble.repository.ShopUnitStatisticRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,11 +27,25 @@ import static ru.rosroble.Batches.*;
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RestApiTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class RestApiTest {
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ShopUnitRepository shopUnitRepository;
+
+    @Autowired
+    private ShopUnitStatisticRepository shopUnitStatisticRepository;
+
+    @BeforeAll
+    @AfterAll
+    public void clean() {
+        shopUnitRepository.deleteAll();
+        shopUnitStatisticRepository.deleteAll();
+    }
 
     private void importsExpect400(String content) throws Exception {
         mockMvc.perform(post("/imports").contentType(MediaType.APPLICATION_JSON)

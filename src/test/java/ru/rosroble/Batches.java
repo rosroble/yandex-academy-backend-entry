@@ -720,7 +720,7 @@ public class Batches {
             }
             """;
 
-    public static String categoryPriceCheckChangeParent =
+    public static final String categoryPriceCheckChangeParent =
             """
             {
                     "items": [
@@ -735,7 +735,7 @@ public class Batches {
                 }
             """;
 
-    public static String categoryPriceCheckChangeParentNodes1C =
+    public static final String categoryPriceCheckChangeParentNodes1C =
             """
             {
                 "id": "6aed457f-8a26-44c0-ac5e-a9d8d4b3c6c2",
@@ -767,7 +767,7 @@ public class Batches {
             }
             """;
 
-    public static String categoryPriceCheckChangeParentNodes4C =
+    public static final String categoryPriceCheckChangeParentNodes4C =
             """
             {
                         "id": "07698dfe-cba2-4a9e-8f6d-50fa3bc12048",
@@ -837,7 +837,7 @@ public class Batches {
                     }
             """;
 
-    public static String importNoParentFoundBatch =
+    public static final String importNoParentFoundBatch =
             """
                             {
                                 "items": [
@@ -859,7 +859,7 @@ public class Batches {
                                 "updateDate": "2022-05-29T14:58:00.000Z"
                             }
                     """;
-    public static String importSelfParentBatch =
+    public static final String importSelfParentBatch =
             """
                             {
                                 "items": [

@@ -13,4 +13,7 @@ public interface ShopUnitStatisticRepository extends JpaRepository<ShopUnitStati
     List<ShopUnitStatisticUnitDTO> getAllById(UUID uuid);
 
     void removeById(UUID id);
+
+    void deleteAll();
+
 }

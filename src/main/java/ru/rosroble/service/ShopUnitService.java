@@ -26,8 +26,6 @@ public class ShopUnitService {
     ShopUnitStatisticRepository shopUnitStatisticRepository;
 
 
-
-
     /**
      * Service method for importing entries via POST /imports endpoint.
      * Accepts a validated ShopUnitImportRequestDTO object.
