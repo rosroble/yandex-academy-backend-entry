@@ -9,7 +9,7 @@
 использующий пакетный менеджер apt, введите следующую команду для установки postgres
 
 ```sh
-$ sudo apt-get install postgresql-12
+sudo apt-get install postgresql-12
 ```
 
 Если установка успешна, можно переходить к созданию БД.
@@ -17,13 +17,13 @@ $ sudo apt-get install postgresql-12
 Переходим в пользователя postgres
 
 ```sh
-$ sudo -i -u postgres
+sudo -i -u postgres
 ```
 
 Теперь запустим консоль PostgreSQL
 
 ```sh
-$ psql
+psql
 ```
 
 Создаём базу основную базу данных и базу данных для тестирования.
@@ -54,7 +54,7 @@ GRANT ALL PRIVILEGES ON DATABASE test TO boris;
 Для того, чтобы собрать jar с приложением, откройте терминал в папке проекта и введите
 
 ```sh
-$ mvn package
+mvn package
 ```
 
 В случае успехе Maven сначала подгрузит все зависимости с центрального репозитория, затем скомпилирует приложение, затем запустит модульные тесты и соберет проект
@@ -69,7 +69,7 @@ $ mvn package
 Получившийся jar можно запустить следующей командой:
 
 ```shell
-$ sudo java -jar yandex-backend-school-entry-task-0.0.1-SNAPSHOT.jar
+sudo java -jar yandex-backend-school-entry-task-0.0.1-SNAPSHOT.jar
 ```
 
 Обращаю внимание на необходимость запускать приложение с правами суперюзера (sudo)
