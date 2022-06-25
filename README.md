@@ -79,6 +79,67 @@ $ sudo java -jar yandex-backend-school-entry-task-0.0.1-SNAPSHOT.jar
 Для личного пользования допускается изменить адрес и порт развертывания, внеся изменения в файл 
 `application.properties`
 
+## Автозапуск сервера на старте машины
+
+При желании можно настроить автозапуск сервера при старте машины, используя Linux под подсистемой systemd.
+
+Для этого переходим в `/etc/systemd/system` и создаём файл autolaunch.service со следующим содержимым:
+
+```shell
+[Unit]
+Description=YandexAcademyEntryTask
+After=syslog.target
+After=network.target
+After=postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+
+User=ubuntu
+Restart=always
+RestartSec=30
+
+OOMScoreAdjust=-100
+
+ExecStart=sudo java -jar /home/ubuntu/rest/target/yandex-backend-school-entry-task-1.0.0.jar
+
+TimeoutSec=100
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Убедитесь, что директория, пользователь в свойстве ExecStart указана верно.
+
+После этого сохраняем файл и включаем наш сервис:
+
+```shell
+sudo systemctl enable autolaunch
+sudo systemctl start autolaunch
+```
+
+Перезагрузим демон systemctl:
+
+```shell
+sudo systemctl daemon-reload
+```
+
+Проверяем, что всё работает:
+
+```shell
+systemctl -l status autolaunch
+```
+
+При необходимости можно наблюдать за stdout сервера в режиме реального времени при помощи команды:
+
+```shell
+sudo journalctl -f -u autolaunch
+```
+
+
+
+
 
 
 
